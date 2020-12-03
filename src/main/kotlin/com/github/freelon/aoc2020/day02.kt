@@ -37,7 +37,7 @@ private fun secondHalf(input: List<Line>) {
     println("Count part 1: $count")
 }
 
-data class Line(val nMin: Int, val nMax: Int, val c: Char, val password: String) {
+private data class Line(val nMin: Int, val nMax: Int, val c: Char, val password: String) {
 
     fun isPasswordOkayByOldPolicy(): Boolean =
         password.count { it == c } in nMin..nMax
