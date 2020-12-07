@@ -51,18 +51,26 @@ private fun neededBags(color: String, rules: List<Rule>): Int {
 }
 
 private fun parseInput(input: String): List<Rule> {
+
+    val innerRegex = Regex("(?<count>\\d) (?<color>\\w+ \\w+) bags?\\.?")
+
     return input.lines()
         .map { line ->
             val containerColor = line.substring(0..line.indexOf(" bags contain ")).trim()
-            var inners = listOf<CountedBag>()
 
-            if (!line.contains("no other bags")) {
-                val right = line.split("contain ")[1]
-                inners = right.split(", ").map { inner ->
-                    val splits = inner.split(" ")
-                    CountedBag(splits[1] + " " + splits[2].trim(), Integer.parseInt(splits[0]))
-                }
-            }
+            val right = line.split("contain ")[1]
+            println("right: $right")
+            val inners = right.split(", ").flatMap { inner ->
+                println("inner text: $inner")
+                innerRegex.matchEntire(inner)?.let { matchResult ->
+                    listOf(
+                        CountedBag(
+                            matchResult.groups["color"]!!.value,
+                            Integer.parseInt(matchResult.groups["count"]!!.value)
+                        )
+                    )
+                } ?: listOf()
+            }.toList()
 
             Rule(containerColor, inners)
         }
