@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class Day07Test {
-    val testInput = "light red bags contain 1 bright white bag, 2 muted yellow bags.\n" +
+    private val testInput = "light red bags contain 1 bright white bag, 2 muted yellow bags.\n" +
             "dark orange bags contain 3 bright white bags, 4 muted yellow bags.\n" +
             "bright white bags contain 1 shiny gold bag.\n" +
             "muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.\n" +
