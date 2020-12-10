@@ -25,8 +25,8 @@ abstract class DayTemplate {
         }
     }
 
-    abstract fun partOne(input: String): String
-    abstract fun partTwo(input: String): String
+    abstract fun partOne(input: String): Any
+    abstract fun partTwo(input: String): Any
 }
 
 fun main() {

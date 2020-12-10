@@ -6,7 +6,7 @@ class Day10 : DayTemplate() {
     override val dayNumber: Int
         get() = 10
 
-    override fun partOne(input: String): String {
+    override fun partOne(input: String): Any {
         val adapters = createAdapterList(input)
         val diffMap = adapters.zipWithNext()
             .fold(mutableMapOf<Long, Long>()) { diffMap, (j, k) ->
@@ -14,12 +14,12 @@ class Day10 : DayTemplate() {
                 diffMap[d] = 1 + diffMap.getOrDefault(d, 0)
                 diffMap
             }
-        return (diffMap.getOrDefault(1, 0) * diffMap.getOrDefault(3, 0)).toString()
+        return (diffMap.getOrDefault(1, 0) * diffMap.getOrDefault(3, 0))
     }
 
-    override fun partTwo(input: String): String {
+    override fun partTwo(input: String): Any {
         val adapters = createAdapterList(input)
-        return adapters.possibleChainingCount(adapters.indices).toString()
+        return adapters.possibleChainingCount(adapters.indices)
     }
 
     private fun List<Long>.possibleChainingCount(

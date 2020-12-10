@@ -6,11 +6,11 @@ class Day12 : DayTemplate() {
     override val dayNumber: Int
         get() = 12
 
-    override fun partOne(input: String): String {
+    override fun partOne(input: String): Any {
         return ""
     }
 
-    override fun partTwo(input: String): String {
+    override fun partTwo(input: String): Any {
         return ""
     }
 }
