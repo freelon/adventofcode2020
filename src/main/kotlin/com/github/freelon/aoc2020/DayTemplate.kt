@@ -8,7 +8,7 @@ import kotlin.system.measureTimeMillis
 
 abstract class DayTemplate {
 
-    abstract val dayNumber: Int
+    open val dayNumber: Int = this.javaClass.simpleName.slice(3..4).toInt()
 
     fun run() {
         try {

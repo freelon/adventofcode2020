@@ -3,8 +3,6 @@ package com.github.freelon.aoc2020.day10
 import com.github.freelon.aoc2020.DayTemplate
 
 class Day10 : DayTemplate() {
-    override val dayNumber: Int
-        get() = 10
 
     override fun partOne(input: String): Any {
         val adapters = createAdapterList(input)
