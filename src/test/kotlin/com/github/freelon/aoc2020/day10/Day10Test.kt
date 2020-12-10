@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class Day10Test {
+    private val day = Day10()
     private val testInput1 = "16\n" +
             "10\n" +
             "15\n" +
@@ -50,13 +51,13 @@ class Day10Test {
 
     @Test
     fun testFirstHalf() {
-        assertEquals(7 * 5, firstHalf(testInput1))
-        assertEquals(22 * 10, firstHalf(testInput2))
+        assertEquals((7 * 5).toString(), day.partOne(testInput1))
+        assertEquals((22 * 10).toString(), day.partOne(testInput2))
     }
 
     @Test
     fun testSecondHalf() {
-        assertEquals(8, secondHalf(testInput1))
-        assertEquals(19208, secondHalf(testInput2))
+        assertEquals("8", day.partTwo(testInput1))
+        assertEquals("19208", day.partTwo(testInput2))
     }
 }
