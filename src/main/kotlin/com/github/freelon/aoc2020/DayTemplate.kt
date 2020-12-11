@@ -1,9 +1,8 @@
 package com.github.freelon.aoc2020
 
-import com.github.freelon.aoc2020.day10.Day10
+import com.github.freelon.aoc2020.day11.Day11
 import com.github.freelon.aoc2020.util.ConsoleColor
 import java.io.File
-import java.lang.Exception
 import kotlin.system.measureTimeMillis
 
 abstract class DayTemplate {
@@ -30,5 +29,5 @@ abstract class DayTemplate {
 }
 
 fun main() {
-    Day10().run()
+    Day11().run()
 }
