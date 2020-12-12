@@ -5,15 +5,19 @@ import kotlin.test.assertEquals
 
 class Day12Test {
     private val day = Day12()
-    private val testInput = ""
+    private val testInput = "F10\n" +
+            "N3\n" +
+            "F7\n" +
+            "R90\n" +
+            "F11"
 
     @Test
     fun testFirstHalf() {
-        assertEquals("", day.partOne(testInput))
+        assertEquals(25, day.partOne(testInput))
     }
 
     @Test
     fun testSecondHalf() {
-        assertEquals("", day.partTwo(testInput))
+        assertEquals(286, day.partTwo(testInput))
     }
 }
