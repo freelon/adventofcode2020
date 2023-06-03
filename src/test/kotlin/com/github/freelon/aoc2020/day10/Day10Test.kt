@@ -51,13 +51,13 @@ class Day10Test {
 
     @Test
     fun testFirstHalf() {
-        assertEquals((7 * 5).toString(), day.partOne(testInput1))
-        assertEquals((22 * 10).toString(), day.partOne(testInput2))
+        assertEquals((7 * 5).toString(), day.partOne(testInput1).toString())
+        assertEquals((22 * 10).toString(), day.partOne(testInput2).toString())
     }
 
     @Test
     fun testSecondHalf() {
-        assertEquals("8", day.partTwo(testInput1))
-        assertEquals("19208", day.partTwo(testInput2))
+        assertEquals("8", day.partTwo(testInput1).toString())
+        assertEquals("19208", day.partTwo(testInput2).toString())
     }
 }
