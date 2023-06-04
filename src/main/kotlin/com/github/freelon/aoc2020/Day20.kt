@@ -97,7 +97,7 @@ data class Point(val x: Int, val y: Int) {
 
 data class Tile(
     val id: Int,
-    private val pixels: Array<Array<Boolean>>
+    val pixels: List<String>
 ) {
 
     init {
@@ -107,21 +107,21 @@ data class Tile(
 
     constructor(input: String) : this(
         input.trim().lines().first().removePrefix("Tile ").removeSuffix(":").toInt(),
-        input.trim().lines().drop(1).map { line -> line.map { c -> c == '#' }.toTypedArray() }.toTypedArray()
+        input.trim().lines().drop(1)
     )
 
-    fun flipVertical() = Tile(id, pixels.reversedArray())
+    fun flipVertical() = Tile(id, pixels.reversed())
 
-    fun flipHorizontal() = Tile(id, pixels.map { it.reversedArray() }.toTypedArray())
+    fun flipHorizontal() = Tile(id, pixels.map { it.reversed() })
 
     fun rotate(): Tile {
-        val transposed = Array(10) { Array(10) { false } }
+        val transposed = List(10) { StringBuilder("          ") }
         for (x in 0 until 10)
             for (y in 0 until 10) {
                 transposed[x][y] = pixels[y][x]
             }
 
-        return Tile(id, transposed.map { it.reversedArray() }.toTypedArray())
+        return Tile(id, transposed.map { it.reversed().toString() })
     }
 
     fun top() = pixels.first()
