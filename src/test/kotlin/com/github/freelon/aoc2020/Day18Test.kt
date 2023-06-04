@@ -14,6 +14,16 @@ class Day18Test {
     }
 
     @Test
+    fun part2() {
+        assertEquals(51L, Day18().partTwo("1 + (2 * 3) + (4 * (5 + 6))"))
+        assertEquals(46L, Day18().partTwo("2 * 3 + (4 * 5)"))
+        assertEquals(1445L, Day18().partTwo("5 + (8 * 3 + 9 + 3 * 4 * 3)"))
+        assertEquals(669060L, Day18().partTwo("5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))"))
+        assertEquals(23340L, Day18().partTwo("11664+2+4*2"))
+        assertEquals(23340L, Day18().partTwo("((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2"))
+    }
+
+    @Test
     fun regex() {
         var m = subExpressionPattern.matcher("(1)")
         assertTrue(m.matches())
