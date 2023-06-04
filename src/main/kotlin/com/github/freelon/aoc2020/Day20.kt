@@ -31,7 +31,8 @@ class Day20 : DayTemplate() {
                         mutated = true
                         break
                     }
-                } else if (point.down() !in grid) {
+                }
+                if (point.down() !in grid) {
                     val candidate =
                         all.filter { it.id != image.id }.firstOrNull { it.top().contentEquals(image.bottom()) }
                     if (candidate != null) {
@@ -39,7 +40,8 @@ class Day20 : DayTemplate() {
                         mutated = true
                         break
                     }
-                } else if (point.left() !in grid) {
+                }
+                if (point.left() !in grid) {
                     val candidate =
                         all.filter { it.id != image.id }.firstOrNull { it.right().contentEquals(image.left()) }
                     if (candidate != null) {
@@ -47,7 +49,8 @@ class Day20 : DayTemplate() {
                         mutated = true
                         break
                     }
-                } else if (point.right() !in grid) {
+                }
+                if (point.right() !in grid) {
                     val candidate =
                         all.filter { it.id != image.id }.firstOrNull { it.left().contentEquals(image.right()) }
                     if (candidate != null) {
@@ -126,8 +129,8 @@ data class Tile(
 
     fun top() = pixels.first()
     fun bottom() = pixels.last()
-    fun left() = pixels.map { it.first() }.toTypedArray()
-    fun right() = pixels.map { it.last() }.toTypedArray()
+    fun left() = pixels.map { it.first() }.joinToString()
+    fun right() = pixels.map { it.last() }.joinToString()
 }
 
 fun main() {
