@@ -9,22 +9,40 @@ fun main() {
 class Day19 : DayTemplate() {
     override fun partOne(input: String): Int = Solver(input).matchCount
 
-    override fun partTwo(input: String): Any {
-        TODO("Not yet implemented")
-    }
+    override fun partTwo(input: String): Int = Solver(input, true).matchCount
+    // 145 too low
 }
 
-class Solver(input: String) {
+class Solver(input: String, substituteRules: Boolean = false) {
     val matchCount: Int
     private val startRule: Rule
     private val rules: Map<Int, Rule>
 
     init {
         val (rawRules, messages) = input.split("\n\n")
-        rules = rawRules.lines().map { line ->
-            val (id, content) = line.split(":")
-            Rule(id.toInt(), content.trim())
-        }.associateBy(Rule::id)
+        val rules = rawRules.lines()
+            .map { line ->
+                val (id, content) = line.split(":")
+                Rule(id.toInt(), content.trim())
+            }
+            .associateBy(Rule::id)
+            .toMutableMap()
+
+        if (substituteRules) {
+            val maxDepth = 10
+            val content8 = (1..maxDepth)
+                .map { " 42".repeat(it).trim() }
+                .joinToString(" | ")
+                .trim()
+            val content11 = (1..maxDepth)
+                .map { " 42".repeat(it).trim() + " " + " 31".repeat(it).trim() }
+                .joinToString(" | ")
+                .trim()
+            rules[8] = Rule(8, content8)
+            rules[11] = Rule(11, content11)
+        }
+
+        this.rules = rules
         startRule = rule(0)
 
         matchCount = messages.lines().count { matches(it) }
@@ -49,17 +67,17 @@ class Solver(input: String) {
                 else -> Miss
             }
         } else if (rule.content.contains("|")) {
-            val (left, right) = rule.content.split('|').map { it.trim() }
+            val parts = rule.content.split('|').map { it.trim() }
 
-            val leftRules = left.split(" ").map { rule(it.toInt()) }
-            val leftResult = checkConcatenated(slice, leftRules)
-            if (leftResult is Match) {
-                leftResult
-            } else {
-                val rightRules = right.split(" ").map { rule(it.toInt()) }
-                val rightResult = checkConcatenated(slice, rightRules)
-                rightResult
+            for (part in parts) {
+                val partRules = part.split(" ").map { rule(it.toInt()) }
+                val partResult = checkConcatenated(slice, partRules)
+                if (partResult is Match) {
+                    return partResult
+                }
             }
+
+            Miss
         } else {
             val rules = rule.content.split(" ").map { rule(it.toInt()) }
             checkConcatenated(slice, rules)
