@@ -1,5 +1,6 @@
 package com.github.freelon.aoc2020.day19
 
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -80,18 +81,21 @@ aaaabbaabbaaaaaaabbbabbbaaabbaabaaa
 babaaabbbaaabaababbaabababaaab
 aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"""
 
-        assertTrue(Solver(input, true).matches("bbabbbbaabaabba"))
-        assertTrue(Solver(input, true).matches("babbbbaabbbbbabbbbbbaabaaabaaa"))
-        assertTrue(Solver(input, true).matches("aaabbbbbbaaaabaababaabababbabaaabbababababaaa"))
-        assertTrue(Solver(input, true).matches("bbbbbbbaaaabbbbaaabbabaaa"))
-        assertTrue(Solver(input, true).matches("bbbababbbbaaaaaaaabbababaaababaabab"))
-        assertTrue(Solver(input, true).matches("ababaaaaaabaaab"))
-        assertTrue(Solver(input, true).matches("ababaaaaabbbaba"))
-        assertTrue(Solver(input, true).matches("baabbaaaabbaaaababbaababb"))
-        assertTrue(Solver(input, true).matches("abbbbabbbbaaaababbbbbbaaaababb"))
-        assertTrue(Solver(input, true).matches("aaaaabbaabaaaaababaa"))
-        assertTrue(Solver(input, true).matches("aaaabbaabbaaaaaaabbbabbbaaabbaabaaa"))
-        assertTrue(Solver(input, true).matches("aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"))
+        assertTrue(Solver(input, true).matchesFunky("bbabbbbaabaabba"))
+        assertTrue(Solver(input, true).matchesFunky("babbbbaabbbbbabbbbbbaabaaabaaa"))
+        assertTrue(Solver(input, true).matchesFunky("aaabbbbbbaaaabaababaabababbabaaabbababababaaa"))
+        assertTrue(Solver(input, true).matchesFunky("bbbbbbbaaaabbbbaaabbabaaa"))
+        assertTrue(Solver(input, true).matchesFunky("bbbababbbbaaaaaaaabbababaaababaabab"))
+        assertTrue(Solver(input, true).matchesFunky("ababaaaaaabaaab"))
+        assertTrue(Solver(input, true).matchesFunky("ababaaaaabbbaba"))
+        assertTrue(Solver(input, true).matchesFunky("baabbaaaabbaaaababbaababb"))
+        assertTrue(Solver(input, true).matchesFunky("abbbbabbbbaaaababbbbbbaaaababb"))
+        assertTrue(Solver(input, true).matchesFunky("aaaaabbaabaaaaababaa"))
+        assertTrue(Solver(input, true).matchesFunky("aaaabbaabbaaaaaaabbbabbbaaabbaabaaa"))
+        assertTrue(Solver(input, true).matchesFunky("aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"))
+        assertFalse(Solver(input, true).matchesFunky("abbbbbabbbaaaababbaabbbbabababbbabbbbbbabaaaa"))
+        assertFalse(Solver(input, true).matchesFunky("aaaabbaaaabbaaa"))
+        assertFalse(Solver(input, true).matchesFunky("babaaabbbaaabaababbaabababaaab"))
 
         assertEquals(12, Day19().partTwo(input))
     }

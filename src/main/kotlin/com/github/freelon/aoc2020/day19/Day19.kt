@@ -9,12 +9,13 @@ fun main() {
 class Day19 : DayTemplate() {
     override fun partOne(input: String): Int = Solver(input).matchCount
 
-    override fun partTwo(input: String): Int = Solver(input, true).matchCount
+    override fun partTwo(input: String): Int = Solver(input, true).matchFunkyCount
     // 145 too low
 }
 
 class Solver(input: String, substituteRules: Boolean = false) {
     val matchCount: Int
+    val matchFunkyCount: Int
     private val startRule: Rule
     private val rules: Map<Int, Rule>
 
@@ -29,7 +30,7 @@ class Solver(input: String, substituteRules: Boolean = false) {
             .toMutableMap()
 
         if (substituteRules) {
-            val maxDepth = 10
+            val maxDepth = 100
             val content8 = (1..maxDepth)
                 .map { " 42".repeat(it).trim() }
                 .joinToString(" | ")
@@ -45,13 +46,64 @@ class Solver(input: String, substituteRules: Boolean = false) {
         this.rules = rules
         startRule = rule(0)
 
-        matchCount = messages.lines().count { matches(it) }
+        matchCount = 0//messages.lines().count { matches(it) }
+        matchFunkyCount = 0//messages.lines().count { matchesFunky(it) }
     }
 
     fun matches(message: String): Boolean {
         val m = matches(startRule, message)
         return m is Match && m.remainder.isEmpty()
     }
+
+    fun matchesFunky(message: String): Boolean {
+        return message
+            .nonEmptyPrefixes()
+            .map { prefix -> Pair(prefix, count42(prefix)) }
+            .filter { it.second > 0 }
+            .any { prefix ->
+                val suffix = message.removePrefix(prefix)
+                val result = count11(suffix)
+                result
+            }
+    }
+
+    private fun count42(s: CharSequence): Int =
+        s.nonEmptyPrefixes()
+            .minOf { prefix ->
+                val m = matches(rule(42), prefix)
+                if (m is Match) {
+                    if (m.remainder.isEmpty()) {
+                        1
+                    } else {
+                        val suffixCount = count42(m.remainder)
+                        if (suffixCount == 0)
+                            0
+                        else
+                            suffixCount + 1
+                    }
+                } else {
+                    0
+                }
+            }
+
+    private fun count11(s: CharSequence): Int =
+        s.nonEmptyPrefixes()
+            .maxOf { prefix ->
+                val m = matches(rule(11), prefix)
+                if (m is Match) {
+                    if (m.remainder.isEmpty()) {
+                        1
+                    } else {
+                        val suffixCount = count11(m.remainder)
+                        if (suffixCount == 0)
+                            0
+                        else
+                            suffixCount + 1
+                    }
+                } else {
+                    0
+                }
+            }
 
     //0: 4 1 5
     //1: 2 3 | 3 2
@@ -116,3 +168,7 @@ sealed class Result
 class Match(val remainder: CharSequence) : Result()
 
 object Miss : Result()
+
+fun CharSequence.nonEmptyPrefixes(): List<CharSequence> = this.indices
+    .map { it + 1 }
+    .map { length -> this.subSequence(0, length) }
