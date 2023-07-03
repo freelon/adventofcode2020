@@ -1,4 +1,4 @@
-package com.github.freelon.aoc2020
+package com.github.freelon.aoc2020.day20
 
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

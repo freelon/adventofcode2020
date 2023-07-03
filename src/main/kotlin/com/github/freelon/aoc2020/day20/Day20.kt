@@ -1,4 +1,6 @@
-package com.github.freelon.aoc2020
+package com.github.freelon.aoc2020.day20
+
+import com.github.freelon.aoc2020.DayTemplate
 
 class Day20 : DayTemplate() {
     override fun partOne(input: String): Any {

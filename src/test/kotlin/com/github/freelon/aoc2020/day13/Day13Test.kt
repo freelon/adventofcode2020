@@ -1,7 +1,5 @@
-package com.github.freelon.aoc2020
+package com.github.freelon.aoc2020.day13
 
-import com.github.freelon.aoc2020.day13.Day13
-import com.github.freelon.aoc2020.day13.solve
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

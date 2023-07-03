@@ -1,4 +1,6 @@
-package com.github.freelon.aoc2020
+package com.github.freelon.aoc2020.day18
+
+import com.github.freelon.aoc2020.DayTemplate
 
 val subExpressionPattern = Regex(".*(\\([\\d*+]+\\)).*").toPattern()
 val samePrecedencePattern = Regex("((\\d+)([+*])(\\d+)).*").toPattern()

@@ -1,4 +1,4 @@
-package com.github.freelon.aoc2020
+package com.github.freelon.aoc2020.day05
 
 import java.io.File
 

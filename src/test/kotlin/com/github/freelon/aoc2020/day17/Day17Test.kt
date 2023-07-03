@@ -1,7 +1,5 @@
 package com.github.freelon.aoc2020.day17
 
-import com.github.freelon.aoc2020.Day17
-import com.github.freelon.aoc2020.P3
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
