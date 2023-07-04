@@ -156,50 +156,6 @@ class Solver(input: String) {
     private fun rule(i: Int) = rules[i]!!
 }
 
-class PregeneratingMatcher(rawRules: List<String>) {
-    private val rules: Map<Int, Rule>
-    private val all42: Set<String>
-    private val all31: Set<String>
-
-    init {
-        rules = rawRules.map { line ->
-            val (id, content) = line.split(":")
-            Rule(id.toInt(), content.trim())
-        }.associateBy(Rule::id)
-
-        all42 = generate(42)
-        all31 = generate(31)
-    }
-
-    fun matches(message: String): Boolean = message.splits().any { (left, right) -> left in all42 }
-
-    private fun generate(ruleId: Int): Set<String> {
-        val rule = rule(ruleId)
-        return if (rule.content.startsWith('"')) {
-            setOf(rule.content.removeSurrounding("\""))
-        } else if (rule.content.contains("|")) {
-            val parts = rule.content.split('|').map { it.trim() }
-
-            parts.map { part ->
-                val partRules = part.split(" ").map { it.toInt() }
-                val partResult = generateFromList(partRules)
-                partResult
-            }.flatten().toSet()
-        } else {
-            val rules = rule.content.split(" ").map { it.toInt() }
-            generateFromList(rules)
-        }
-    }
-
-    private fun generateFromList(parts: List<Int>): Set<String> {
-        return setOf()
-    }
-
-    private fun rule(ruleId: Int): Rule {
-        return rules[ruleId]!!
-    }
-}
-
 data class Rule(val id: Int, val content: String)
 
 sealed class Result {
