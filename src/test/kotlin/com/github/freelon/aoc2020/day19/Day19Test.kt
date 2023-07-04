@@ -94,25 +94,24 @@ aaaabbb
 
     @Test
     fun `expansion for big example`() {
-        val input = EXAMPLE_BIG
-        val all = Solver(input).expand(0)
-        println("Size: ${all.size}")
+        val solver = Solver(EXAMPLE_BIG)
+        assertTrue(solver.set42.intersect(solver.set31).isEmpty())
 
-        assertTrue("bbabbbbaabaabba" in all)
-        assertTrue("babbbbaabbbbbabbbbbbaabaaabaaa" in all)
-        assertTrue("aaabbbbbbaaaabaababaabababbabaaabbababababaaa" in all)
-        assertTrue("bbbbbbbaaaabbbbaaabbabaaa" in all)
-        assertTrue("bbbababbbbaaaaaaaabbababaaababaabab" in all)
-        assertTrue("ababaaaaaabaaab" in all)
-        assertTrue("ababaaaaabbbaba" in all)
-        assertTrue("baabbaaaabbaaaababbaababb" in all)
-        assertTrue("abbbbabbbbaaaababbbbbbaaaababb" in all)
-        assertTrue("aaaaabbaabaaaaababaa" in all)
-        assertTrue("aaaabbaabbaaaaaaabbbabbbaaabbaabaaa" in all)
-        assertTrue("aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba" in all)
-        assertFalse("abbbbbabbbaaaababbaabbbbabababbbabbbbbbabaaaa" in all)
-        assertFalse("aaaabbaaaabbaaa" in all)
-        assertFalse("babaaabbbaaabaababbaabababaaab" in all)
+        assertTrue(solver.matchByExpansion("bbabbbbaabaabba"))
+        assertTrue(solver.matchByExpansion("babbbbaabbbbbabbbbbbaabaaabaaa"))
+        assertTrue(solver.matchByExpansion("aaabbbbbbaaaabaababaabababbabaaabbababababaaa"))
+        assertTrue(solver.matchByExpansion("bbbbbbbaaaabbbbaaabbabaaa"))
+        assertTrue(solver.matchByExpansion("bbbababbbbaaaaaaaabbababaaababaabab"))
+        assertTrue(solver.matchByExpansion("ababaaaaaabaaab"))
+        assertTrue(solver.matchByExpansion("ababaaaaabbbaba"))
+        assertTrue(solver.matchByExpansion("baabbaaaabbaaaababbaababb"))
+        assertTrue(solver.matchByExpansion("abbbbabbbbaaaababbbbbbaaaababb"))
+        assertTrue(solver.matchByExpansion("aaaaabbaabaaaaababaa"))
+        assertTrue(solver.matchByExpansion("aaaabbaabbaaaaaaabbbabbbaaabbaabaaa"))
+        assertTrue(solver.matchByExpansion("aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"))
+        assertFalse(solver.matchByExpansion("abbbbbabbbaaaababbaabbbbabababbbabbbbbbabaaaa"))
+        assertFalse(solver.matchByExpansion("aaaabbaaaabbaaa"))
+        assertFalse(solver.matchByExpansion("babaaabbbaaabaababbaabababaaab"))
     }
 }
 

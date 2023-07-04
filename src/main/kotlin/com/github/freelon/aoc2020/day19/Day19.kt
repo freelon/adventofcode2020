@@ -1,6 +1,7 @@
 package com.github.freelon.aoc2020.day19
 
 import com.github.freelon.aoc2020.DayTemplate
+import kotlin.math.min
 
 fun main() {
     Day19().run()
@@ -9,8 +10,13 @@ fun main() {
 class Day19 : DayTemplate() {
     override fun partOne(input: String): Int = Solver(input).matchCount
 
-    override fun partTwo(input: String): Int = Solver(input).matchFunkyCount
+    override fun partTwo(input: String): Int {
+        val solver = Solver(input)
+        val messages = input.split("\n\n")[1].lines()
+        return messages.count { solver.matchByExpansion(it) }
+    }
     // 145 too low
+    // 341 is wrong
     // 353 is too high
 }
 
@@ -18,6 +24,9 @@ class Solver(input: String) {
     private var messages: String
     val matchCount: Int
         get() = messages.lines().count { matches(it) }
+    val set42: Set<String>
+    val set31: Set<String>
+    private val expansionCache: MutableMap<Int, Set<String>> = mutableMapOf()
 
     val matchFunkyCount: Int
         get() = messages.lines().withIndex().count {
@@ -37,6 +46,16 @@ class Solver(input: String) {
 
         this.rules = rules
         startRule = rule(0)
+
+        if (rules.containsKey(42)) {
+            set42 = expand(42)
+            set31 = expand(31)
+            assert(set42.all { it.length == set42.first().length })
+            assert(set31.all { it.length == set31.first().length })
+        } else {
+            set42 = setOf()
+            set31 = setOf()
+        }
     }
 
     fun matches(message: String): Boolean {
@@ -46,8 +65,6 @@ class Solver(input: String) {
 
     fun matchesFunky(message: String): Boolean {
         return message.splits().map { (prefix, suffix) ->
-            if (prefix == "babbbbaabbbbbabbbbbbaabaa")
-                println("x")
             val p = Pair(
                 count42(prefix), count31(suffix)
             )
@@ -156,25 +173,29 @@ class Solver(input: String) {
     private fun rule(i: Int) = rules[i]!!
 
     fun expand(id: Int): Set<String> {
-        val rule = rule(id)
-        return if (rule.content.startsWith('"')) {
-            setOf(rule.content.removeSurrounding("\""))
+        if (!expansionCache.containsKey(id)) {
+            val rule = rule(id)
+            val set = if (rule.content.startsWith('"')) {
+                setOf(rule.content.removeSurrounding("\""))
 
-        } else if (rule.content.contains("|")) {
-            val parts = rule.content.split('|').map { it.trim() }
+            } else if (rule.content.contains("|")) {
+                val parts = rule.content.split('|').map { it.trim() }
 
-            parts.map { part ->
-                val partRules = part.split(" ").map { it.toInt() }
-                expand(partRules)
-            }.flatten()
-                .toSet()
+                parts.map { part ->
+                    val partRules = part.split(" ").map { it.toInt() }
+                    expand(partRules)
+                }.flatten()
+                    .toSet()
 
 
-        } else {
-            val rules = rule.content.split(" ").map { it.toInt() }
-            expand(rules)
+            } else {
+                val rules = rule.content.split(" ").map { it.toInt() }
+                expand(rules)
+            }
+            expansionCache[id] = set
         }
 
+        return expansionCache[id]!!
     }
 
     private fun expand(ids: List<Int>): Set<String> =
@@ -182,6 +203,16 @@ class Solver(input: String) {
             val forRule = expand(rule)
             acc.flatMap { a -> forRule.map { b -> a + b } }.toSet()
         }
+
+    fun matchByExpansion(message: String): Boolean {
+        val len = set42.first().length
+        if (message.length % len != 0)
+            return false
+        val parts = message.chunked(len)
+        return (min(1, parts.size / 2) until parts.size).any { n42 ->
+            parts.take(n42).all { it in set42 } and parts.drop(n42).all { it in set31 }
+        }
+    }
 }
 
 data class Rule(val id: Int, val content: String)
