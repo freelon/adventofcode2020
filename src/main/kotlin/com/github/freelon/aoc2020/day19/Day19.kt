@@ -9,18 +9,23 @@ fun main() {
 class Day19 : DayTemplate() {
     override fun partOne(input: String): Int = Solver(input).matchCount
 
-    override fun partTwo(input: String): Int = Solver(input, true).matchFunkyCount
+    override fun partTwo(input: String): Int = Solver(input).matchFunkyCount
     // 145 too low
 }
 
-class Solver(input: String, substituteRules: Boolean = false) {
+class Solver(input: String) {
+    private var messages: String
     val matchCount: Int
+        get() = messages.lines().count { matches(it) }
+
     val matchFunkyCount: Int
+        get() = messages.lines().count { matchesFunky(it) }
     private val startRule: Rule
     private val rules: Map<Int, Rule>
 
     init {
         val (rawRules, messages) = input.split("\n\n")
+        this.messages = messages
         val rules = rawRules.lines()
             .map { line ->
                 val (id, content) = line.split(":")
@@ -29,25 +34,22 @@ class Solver(input: String, substituteRules: Boolean = false) {
             .associateBy(Rule::id)
             .toMutableMap()
 
-        if (substituteRules) {
-            val maxDepth = 100
-            val content8 = (1..maxDepth)
-                .map { " 42".repeat(it).trim() }
-                .joinToString(" | ")
-                .trim()
-            val content11 = (1..maxDepth)
-                .map { " 42".repeat(it).trim() + " " + " 31".repeat(it).trim() }
-                .joinToString(" | ")
-                .trim()
-            rules[8] = Rule(8, content8)
-            rules[11] = Rule(11, content11)
-        }
+//        if (substituteRules) {
+//            val maxDepth = 100
+//            val content8 = (1..maxDepth)
+//                .map { " 42".repeat(it).trim() }
+//                .joinToString(" | ")
+//                .trim()
+//            val content11 = (1..maxDepth)
+//                .map { " 42".repeat(it).trim() + " " + " 31".repeat(it).trim() }
+//                .joinToString(" | ")
+//                .trim()
+//            rules[8] = Rule(8, content8)
+//            rules[11] = Rule(11, content11)
+//        }
 
         this.rules = rules
         startRule = rule(0)
-
-        matchCount = 0//messages.lines().count { matches(it) }
-        matchFunkyCount = 0//messages.lines().count { matchesFunky(it) }
     }
 
     fun matches(message: String): Boolean {
@@ -61,15 +63,15 @@ class Solver(input: String, substituteRules: Boolean = false) {
             .map { prefix -> Pair(prefix, count42(prefix)) }
             .filter { it.second > 0 }
             .any { prefix ->
-                val suffix = message.removePrefix(prefix)
-                val result = count11(suffix)
-                result
+                val suffix = message.removePrefix(prefix.first)
+                val result = count31(suffix)
+                result > 0 && result <= prefix.second
             }
     }
 
     private fun count42(s: CharSequence): Int =
         s.nonEmptyPrefixes()
-            .minOf { prefix ->
+            .map { prefix ->
                 val m = matches(rule(42), prefix)
                 if (m is Match) {
                     if (m.remainder.isEmpty()) {
@@ -84,26 +86,25 @@ class Solver(input: String, substituteRules: Boolean = false) {
                 } else {
                     0
                 }
-            }
+            }.filter { it > 0 }
+            .minOrNull() ?: 0
 
-    private fun count11(s: CharSequence): Int =
-        s.nonEmptyPrefixes()
-            .maxOf { prefix ->
-                val m = matches(rule(11), prefix)
-                if (m is Match) {
-                    if (m.remainder.isEmpty()) {
-                        1
-                    } else {
-                        val suffixCount = count11(m.remainder)
-                        if (suffixCount == 0)
-                            0
-                        else
-                            suffixCount + 1
-                    }
-                } else {
+    private fun count31(s: CharSequence): Int {
+        val m = matches(rule(31), s)
+        return if (m is Match) {
+            if (m.remainder.isEmpty()) {
+                1
+            } else {
+                val suffixCount = count31(m.remainder)
+                if (suffixCount == 0)
                     0
-                }
+                else
+                    suffixCount + 1
             }
+        } else {
+            0
+        }
+    }
 
     //0: 4 1 5
     //1: 2 3 | 3 2
