@@ -30,27 +30,10 @@ class Solver(input: String) {
     init {
         val (rawRules, messages) = input.split("\n\n")
         this.messages = messages
-        val rules = rawRules.lines()
-            .map { line ->
-                val (id, content) = line.split(":")
-                Rule(id.toInt(), content.trim())
-            }
-            .associateBy(Rule::id)
-            .toMutableMap()
-
-//        if (substituteRules) {
-//            val maxDepth = 100
-//            val content8 = (1..maxDepth)
-//                .map { " 42".repeat(it).trim() }
-//                .joinToString(" | ")
-//                .trim()
-//            val content11 = (1..maxDepth)
-//                .map { " 42".repeat(it).trim() + " " + " 31".repeat(it).trim() }
-//                .joinToString(" | ")
-//                .trim()
-//            rules[8] = Rule(8, content8)
-//            rules[11] = Rule(11, content11)
-//        }
+        val rules = rawRules.lines().map { line ->
+            val (id, content) = line.split(":")
+            Rule(id.toInt(), content.trim())
+        }.associateBy(Rule::id).toMutableMap()
 
         this.rules = rules
         startRule = rule(0)
@@ -62,41 +45,44 @@ class Solver(input: String) {
     }
 
     fun matchesFunky(message: String): Boolean {
-        return message
-            .nonEmptyPrefixes()
-            .map { prefix -> Pair(prefix, count42(prefix)) }
-            .filter { it.second > 0 }
-            .any { prefix ->
-                val suffix = message.removePrefix(prefix.first)
-                val result = count31(suffix)
-                result > 0 && result <= prefix.second
-            }
+        return message.splits().map { (prefix, suffix) ->
+            if (prefix == "babbbbaabbbbbabbbbbbaabaa")
+                println("x")
+            val p = Pair(
+                count42(prefix), count31(suffix)
+            )
+            p
+        }.any { (c42, c31) -> c42 > 0 && c31 > 0 && c31 <= c42 }
     }
 
     private val cache42: MutableMap<CharSequence, Int> = mutableMapOf()
     private fun count42(s: CharSequence): Int {
-        if (!cache42.containsKey(s))
-            cache42[s] = s.nonEmptyPrefixes()
-                .map { prefix ->
-                    val m = matches(rule(42), prefix)
-                    if (m is Match) {
-                        if (m.remainder.isEmpty()) {
-                            1
-                        } else {
-                            val suffixCount = count42(m.remainder)
-                            if (suffixCount == 0)
-                                0
-                            else
-                                suffixCount + 1
-                        }
-                    } else {
-                        0
-                    }
-                }.filter { it > 0 }
-                .minOrNull() ?: 0
+        if (!cache42.containsKey(s)) {
+            cache42[s] = computeCount42(s)
+        }
 
         return cache42.getValue(s)
     }
+
+    private fun computeCount42(s: CharSequence) = s.splits()
+        .map { (prefix, suffix) ->
+            val m = matches(rule(42), prefix)
+            if (m is Match) {
+                val remainder = m.remainder.toString() + suffix
+                if (remainder.isEmpty())
+                    return@map 1
+                val mSuffix = matches(rule(42), remainder)
+                if (mSuffix.isFullMatch) {
+                    val suffixCount = count42(remainder)
+                    suffixCount + 1
+                } else {
+                    0
+                }
+            } else {
+                0
+            }
+        }.filter { it > 0 }
+        .minOrNull() ?: 0
 
     private fun count31(s: CharSequence): Int {
         val m = matches(rule(31), s)
@@ -104,11 +90,13 @@ class Solver(input: String) {
             if (m.remainder.isEmpty()) {
                 1
             } else {
-                val suffixCount = count31(m.remainder)
-                if (suffixCount == 0)
-                    0
-                else
+                val suffixMatch = matches(rule(31), m.remainder)
+                if (suffixMatch.isFullMatch) {
+                    val suffixCount = count31(m.remainder)
                     suffixCount + 1
+                } else {
+                    0
+                }
             }
         } else {
             0
@@ -116,11 +104,11 @@ class Solver(input: String) {
     }
 
     //0: 4 1 5
-    //1: 2 3 | 3 2
-    //2: 4 4 | 5 5
-    //3: 4 5 | 5 4
-    //4: "a"
-    //5: "b"
+//1: 2 3 | 3 2
+//2: 4 4 | 5 5
+//3: 4 5 | 5 4
+//4: "a"
+//5: "b"
     private fun matches(rule: Rule, slice: CharSequence): Result {
         return if (rule.content.startsWith('"')) {
             val c = rule.content[1]
@@ -147,8 +135,7 @@ class Solver(input: String) {
     }
 
     private fun checkConcatenated(
-        slice: CharSequence,
-        rulesToApply: List<Rule>
+        slice: CharSequence, rulesToApply: List<Rule>
     ): Result {
         var remainder = slice
         var success = true
@@ -162,23 +149,68 @@ class Solver(input: String) {
             }
         }
 
-        return if (success)
-            Match(remainder)
-        else
-            Miss
+        return if (success) Match(remainder)
+        else Miss
     }
 
     private fun rule(i: Int) = rules[i]!!
 }
 
+class PregeneratingMatcher(rawRules: List<String>) {
+    private val rules: Map<Int, Rule>
+    private val all42: Set<String>
+    private val all31: Set<String>
+
+    init {
+        rules = rawRules.map { line ->
+            val (id, content) = line.split(":")
+            Rule(id.toInt(), content.trim())
+        }.associateBy(Rule::id)
+
+        all42 = generate(42)
+        all31 = generate(31)
+    }
+
+    fun matches(message: String): Boolean = message.splits().any { (left, right) -> left in all42 }
+
+    private fun generate(ruleId: Int): Set<String> {
+        val rule = rule(ruleId)
+        return if (rule.content.startsWith('"')) {
+            setOf(rule.content.removeSurrounding("\""))
+        } else if (rule.content.contains("|")) {
+            val parts = rule.content.split('|').map { it.trim() }
+
+            parts.map { part ->
+                val partRules = part.split(" ").map { it.toInt() }
+                val partResult = generateFromList(partRules)
+                partResult
+            }.flatten().toSet()
+        } else {
+            val rules = rule.content.split(" ").map { it.toInt() }
+            generateFromList(rules)
+        }
+    }
+
+    private fun generateFromList(parts: List<Int>): Set<String> {
+        return setOf()
+    }
+
+    private fun rule(ruleId: Int): Rule {
+        return rules[ruleId]!!
+    }
+}
+
 data class Rule(val id: Int, val content: String)
 
-sealed class Result
+sealed class Result {
+    open val isFullMatch get() = false
+}
 
-class Match(val remainder: CharSequence) : Result()
+class Match(val remainder: CharSequence) : Result() {
+    override val isFullMatch get() = remainder.isEmpty()
+}
 
 object Miss : Result()
 
-fun CharSequence.nonEmptyPrefixes(): List<CharSequence> = this.indices
-    .map { it + 1 }
-    .map { length -> this.subSequence(0, length) }
+fun CharSequence.splits(): List<Pair<CharSequence, CharSequence>> = this.indices.map { it + 1 }
+    .map { splitAt -> Pair(this.subSequence(0, splitAt), this.subSequence(splitAt, this.length)) }
