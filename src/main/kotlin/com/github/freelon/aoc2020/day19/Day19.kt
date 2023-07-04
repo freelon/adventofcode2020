@@ -154,6 +154,34 @@ class Solver(input: String) {
     }
 
     private fun rule(i: Int) = rules[i]!!
+
+    fun expand(id: Int): Set<String> {
+        val rule = rule(id)
+        return if (rule.content.startsWith('"')) {
+            setOf(rule.content.removeSurrounding("\""))
+
+        } else if (rule.content.contains("|")) {
+            val parts = rule.content.split('|').map { it.trim() }
+
+            parts.map { part ->
+                val partRules = part.split(" ").map { it.toInt() }
+                expand(partRules)
+            }.flatten()
+                .toSet()
+
+
+        } else {
+            val rules = rule.content.split(" ").map { it.toInt() }
+            expand(rules)
+        }
+
+    }
+
+    private fun expand(ids: List<Int>): Set<String> =
+        ids.fold(setOf("")) { acc, rule ->
+            val forRule = expand(rule)
+            acc.flatMap { a -> forRule.map { b -> a + b } }.toSet()
+        }
 }
 
 data class Rule(val id: Int, val content: String)
