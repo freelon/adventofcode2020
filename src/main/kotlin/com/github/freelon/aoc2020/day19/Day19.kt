@@ -11,6 +11,7 @@ class Day19 : DayTemplate() {
 
     override fun partTwo(input: String): Int = Solver(input).matchFunkyCount
     // 145 too low
+    // 353 is too high
 }
 
 class Solver(input: String) {
@@ -19,7 +20,10 @@ class Solver(input: String) {
         get() = messages.lines().count { matches(it) }
 
     val matchFunkyCount: Int
-        get() = messages.lines().count { matchesFunky(it) }
+        get() = messages.lines().withIndex().count {
+            println("Starting ${it.index + 1}/${messages.lines().size}")
+            matchesFunky(it.value)
+        }
     private val startRule: Rule
     private val rules: Map<Int, Rule>
 
@@ -69,25 +73,30 @@ class Solver(input: String) {
             }
     }
 
-    private fun count42(s: CharSequence): Int =
-        s.nonEmptyPrefixes()
-            .map { prefix ->
-                val m = matches(rule(42), prefix)
-                if (m is Match) {
-                    if (m.remainder.isEmpty()) {
-                        1
+    private val cache42: MutableMap<CharSequence, Int> = mutableMapOf()
+    private fun count42(s: CharSequence): Int {
+        if (!cache42.containsKey(s))
+            cache42[s] = s.nonEmptyPrefixes()
+                .map { prefix ->
+                    val m = matches(rule(42), prefix)
+                    if (m is Match) {
+                        if (m.remainder.isEmpty()) {
+                            1
+                        } else {
+                            val suffixCount = count42(m.remainder)
+                            if (suffixCount == 0)
+                                0
+                            else
+                                suffixCount + 1
+                        }
                     } else {
-                        val suffixCount = count42(m.remainder)
-                        if (suffixCount == 0)
-                            0
-                        else
-                            suffixCount + 1
+                        0
                     }
-                } else {
-                    0
-                }
-            }.filter { it > 0 }
-            .minOrNull() ?: 0
+                }.filter { it > 0 }
+                .minOrNull() ?: 0
+
+        return cache42.getValue(s)
+    }
 
     private fun count31(s: CharSequence): Int {
         val m = matches(rule(31), s)
