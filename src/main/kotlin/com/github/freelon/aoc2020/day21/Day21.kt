@@ -51,8 +51,42 @@ class Day21 : DayTemplate() {
             Pair(ingredients, allergenes)
         }
 
-    override fun partTwo(input: String): Any {
-        return Unit
+    override fun partTwo(input: String): String {
+        val recipes = parse(input)
+        val ingredients = recipes.flatMap { it.first }.toSet()
+        val allergenesOfRecipeWithIngredient: Map<String, Set<String>> = ingredients.associateWith { ingredient ->
+            recipes
+                .filter { recipe -> recipe.first.contains(ingredient) }
+                .flatMap { recipe -> recipe.second }
+                .toSet()
+        }
+
+        val allergeneIngredients = mutableMapOf<String, MutableSet<String>>()
+        for ((ingredient, allergenesOfRecipes) in allergenesOfRecipeWithIngredient) {
+            for (allergene in allergenesOfRecipes) {
+                // if ingredient had this allergene it must be in all recipes that declare that allergene
+                val isContainedInAllRecipes =
+                    recipes
+                        .filter { (_, a) -> a.contains(allergene) }
+                        .all { (i, _) -> i.contains(ingredient) }
+                if (isContainedInAllRecipes)
+                    allergeneIngredients.computeIfAbsent(ingredient) { mutableSetOf() }.add(allergene)
+            }
+        }
+
+        val solution = mutableMapOf<String, String>()
+        while (allergeneIngredients.values.any { it.size == 1 }) {
+            val definit = allergeneIngredients.entries.find { it.value.size == 1 }!!
+            val allergene = definit.value.first()
+            solution[definit.key] = allergene
+            allergeneIngredients.remove(definit.key)
+            allergeneIngredients.values.forEach { allergenes -> allergenes.remove(allergene) }
+        }
+
+        if (allergeneIngredients.isNotEmpty())
+            println("missing: $allergeneIngredients")
+
+        return solution.entries.sortedBy { it.value }.joinToString(",") { it.key }
     }
 }
 
