@@ -17,7 +17,12 @@ mem[8] = 0
     }
 
     @Test
-    fun `part2 examples`() {
-
+    fun part2() {
+        val input = """mask = 000000000000000000000000000000X1001X
+mem[42] = 100
+mask = 00000000000000000000000000000000X0XX
+mem[26] = 1
+"""
+        assertEquals(208L, Day14().partTwo(input))
     }
 }
