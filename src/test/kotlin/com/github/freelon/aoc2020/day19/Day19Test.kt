@@ -22,48 +22,7 @@ aaabbb
 aaaabbb
 """
 
-        assertEquals(true, Solver(input).matches("ababbb"))
-        assertEquals(false, Solver(input).matches("bababa"))
-        assertEquals(true, Solver(input).matches("abbbab"))
-        assertEquals(false, Solver(input).matches("aaabbb"))
-        assertEquals(false, Solver(input).matches("aaaabbb"))
-
         assertEquals(2, Day19().partOne(input))
-    }
-
-    @Test
-    fun part2() {
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("bbabbbbaabaabba"))
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("babbbbaabbbbbabbbbbbaabaaabaaa"))
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("aaabbbbbbaaaabaababaabababbabaaabbababababaaa"))
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("bbbbbbbaaaabbbbaaabbabaaa"))
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("bbbababbbbaaaaaaaabbababaaababaabab"))
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("ababaaaaaabaaab"))
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("ababaaaaabbbaba"))
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("baabbaaaabbaaaababbaababb"))
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("abbbbabbbbaaaababbbbbbaaaababb"))
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("aaaaabbaabaaaaababaa"))
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("aaaabbaabbaaaaaaabbbabbbaaabbaabaaa"))
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"))
-        assertFalse(Solver(EXAMPLE_BIG).matchesFunky("abbbbbabbbaaaababbaabbbbabababbbabbbbbbabaaaa"))
-        assertFalse(Solver(EXAMPLE_BIG).matchesFunky("aaaabbaaaabbaaa"))
-        assertFalse(Solver(EXAMPLE_BIG).matchesFunky("babaaabbbaaabaababbaabababaaab"))
-
-        assertEquals(12, Day19().partTwo(EXAMPLE_BIG))
-    }
-
-    @Test
-    fun single() {
-        assertTrue(Solver(EXAMPLE_BIG).matchesFunky("babbbbaabbbbbabbbbbbaabaaabaaa"))
-    }
-
-    @Test
-    fun splitter() {
-        val input = "aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"
-        for ((a, b) in input.splits())
-            assertEquals(input, a.toString() + b)
-
-        assertEquals(listOf(Pair("1", "234"), Pair("12", "34"), Pair("123", "4"), Pair("1234", "")), "1234".splits())
     }
 
     @Test

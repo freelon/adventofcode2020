@@ -8,31 +8,26 @@ fun main() {
 }
 
 class Day19 : DayTemplate() {
-    override fun partOne(input: String): Int = Solver(input).matchCount
+    override fun partOne(input: String): Int {
+        val solver = Solver(input)
+        val messages = input.split("\n\n")[1].lines()
+        val set = solver.expand(0)
+        return messages.count { it in set }
+    }
 
     override fun partTwo(input: String): Int {
         val solver = Solver(input)
         val messages = input.split("\n\n")[1].lines()
         return messages.count { solver.matchByExpansion(it) }
     }
-    // 145 too low
-    // 341 is wrong
-    // 353 is too high
 }
 
 class Solver(input: String) {
     private var messages: String
-    val matchCount: Int
-        get() = messages.lines().count { matches(it) }
     val set42: Set<String>
     val set31: Set<String>
     private val expansionCache: MutableMap<Int, Set<String>> = mutableMapOf()
 
-    val matchFunkyCount: Int
-        get() = messages.lines().withIndex().count {
-            println("Starting ${it.index + 1}/${messages.lines().size}")
-            matchesFunky(it.value)
-        }
     private val startRule: Rule
     private val rules: Map<Int, Rule>
 
@@ -51,81 +46,20 @@ class Solver(input: String) {
             set42 = expand(42)
             set31 = expand(31)
             assert(set42.all { it.length == set42.first().length })
-            assert(set31.all { it.length == set31.first().length })
+            assert(set31.all { it.length == set42.first().length })
+            assert(set42.intersect(set31).isEmpty())
         } else {
             set42 = setOf()
             set31 = setOf()
         }
     }
 
-    fun matches(message: String): Boolean {
-        val m = matches(startRule, message)
-        return m is Match && m.remainder.isEmpty()
-    }
-
-    fun matchesFunky(message: String): Boolean {
-        return message.splits().map { (prefix, suffix) ->
-            val p = Pair(
-                count42(prefix), count31(suffix)
-            )
-            p
-        }.any { (c42, c31) -> c42 > 0 && c31 > 0 && c31 <= c42 }
-    }
-
-    private val cache42: MutableMap<CharSequence, Int> = mutableMapOf()
-    private fun count42(s: CharSequence): Int {
-        if (!cache42.containsKey(s)) {
-            cache42[s] = computeCount42(s)
-        }
-
-        return cache42.getValue(s)
-    }
-
-    private fun computeCount42(s: CharSequence) = s.splits()
-        .map { (prefix, suffix) ->
-            val m = matches(rule(42), prefix)
-            if (m is Match) {
-                val remainder = m.remainder.toString() + suffix
-                if (remainder.isEmpty())
-                    return@map 1
-                val mSuffix = matches(rule(42), remainder)
-                if (mSuffix.isFullMatch) {
-                    val suffixCount = count42(remainder)
-                    suffixCount + 1
-                } else {
-                    0
-                }
-            } else {
-                0
-            }
-        }.filter { it > 0 }
-        .minOrNull() ?: 0
-
-    private fun count31(s: CharSequence): Int {
-        val m = matches(rule(31), s)
-        return if (m is Match) {
-            if (m.remainder.isEmpty()) {
-                1
-            } else {
-                val suffixMatch = matches(rule(31), m.remainder)
-                if (suffixMatch.isFullMatch) {
-                    val suffixCount = count31(m.remainder)
-                    suffixCount + 1
-                } else {
-                    0
-                }
-            }
-        } else {
-            0
-        }
-    }
-
     //0: 4 1 5
-//1: 2 3 | 3 2
-//2: 4 4 | 5 5
-//3: 4 5 | 5 4
-//4: "a"
-//5: "b"
+    //1: 2 3 | 3 2
+    //2: 4 4 | 5 5
+    //3: 4 5 | 5 4
+    //4: "a"
+    //5: "b"
     private fun matches(rule: Rule, slice: CharSequence): Result {
         return if (rule.content.startsWith('"')) {
             val c = rule.content[1]
@@ -155,19 +89,16 @@ class Solver(input: String) {
         slice: CharSequence, rulesToApply: List<Rule>
     ): Result {
         var remainder = slice
-        var success = true
         for (r in rulesToApply) {
             when (val m = matches(r, remainder)) {
                 is Match -> remainder = m.remainder
                 is Miss -> {
-                    success = false
-                    break
+                    return Miss
                 }
             }
         }
 
-        return if (success) Match(remainder)
-        else Miss
+        return Match(remainder)
     }
 
     private fun rule(i: Int) = rules[i]!!
@@ -206,11 +137,10 @@ class Solver(input: String) {
 
     fun matchByExpansion(message: String): Boolean {
         val len = set42.first().length
-        if (message.length % len != 0)
-            return false
         val parts = message.chunked(len)
         return (min(1, parts.size / 2) until parts.size).any { n42 ->
-            parts.take(n42).all { it in set42 } and parts.drop(n42).all { it in set31 }
+            val n31 = parts.size - n42
+            parts.take(n42).all { it in set42 } and parts.drop(n42).all { it in set31 } and (n42 > n31)
         }
     }
 }
@@ -226,6 +156,3 @@ class Match(val remainder: CharSequence) : Result() {
 }
 
 object Miss : Result()
-
-fun CharSequence.splits(): List<Pair<CharSequence, CharSequence>> = this.indices.map { it + 1 }
-    .map { splitAt -> Pair(this.subSequence(0, splitAt), this.subSequence(splitAt, this.length)) }
