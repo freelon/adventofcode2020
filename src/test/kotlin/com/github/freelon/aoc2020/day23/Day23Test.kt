@@ -12,5 +12,6 @@ class Day23Test {
 
     @Test
     fun partTwo() {
+        assertEquals(149245887792L, Day23().partTwo("389125467"))
     }
 }

@@ -8,40 +8,82 @@ fun main() {
 
 class Day23 : DayTemplate() {
     override fun partOne(input: String): String {
-        var cups = input.split("").filterNot { it.isBlank() }.map { it.toInt() }
-        var current = cups[0]
-        repeat(100) {
-            println("-- move ${it + 1} --")
-            println("cups: " + cups.joinToString(" ") { cup -> if (cup == current) "($cup)" else "$cup" })
-            val currentIndex = cups.indexOf(current)
-            cups = cups.rotateLeft(currentIndex)
-            val toMove = cups.subList(1, 4)
-            cups = cups.subList(0, 1) + cups.subList(4, cups.size)
-            println("pick up: ${toMove.joinToString()}")
+        val cups = play(input, 9, 100)
+        return follow(cups).drop(1).joinToString("")
+    }
+
+    override fun partTwo(input: String): Long {
+        val cups = play(input, 1_000_000, 10_000_000)
+        return cups[1].successor.toLong() * cups[cups[1].successor].successor.toLong()
+    }
+
+    private fun play(input: String, nCups: Int, nRounds: Int): List<Cup> {
+        val beginning = input.split("").filterNot { it.isBlank() }.map { it.toInt() }
+        val cups = List(nCups + 1) {
+            Cup(
+                it, it - 1, if (it == nCups) {
+                    1
+                } else {
+                    it + 1
+                }
+            )
+        }
+        var last = nCups
+        for (b in beginning) {
+            cups[b].predecessor = last
+            cups[last].successor = b
+            last = b
+        }
+        if (nCups > 9) {
+            cups[last].successor = 10
+            cups[10].predecessor = last
+        } else {
+            cups[last].successor = beginning.first()
+            cups[beginning.first()].predecessor = last
+        }
+
+        var current = beginning.first()
+        repeat(nRounds) {
+            val pickUp = listOf(
+                cups[current].successor,
+                cups[cups[current].successor].successor,
+                cups[cups[cups[current].successor].successor].successor
+            )
             var destinationCup = current - 1
-            while (!cups.contains(destinationCup)) {
+            while (destinationCup < 1 || pickUp.contains(destinationCup)) {
                 if (destinationCup == 0) {
-                    destinationCup = 9
+                    destinationCup = nCups
                     continue
                 }
                 destinationCup--
             }
-            println("destination: $destinationCup")
-            val destinationCupIndex = cups.indexOf(destinationCup)
-            cups = cups.rotateLeft(destinationCupIndex + 1)
-            cups = toMove + cups
-            val newCurrentIndex = cups.indexOf(current)
-            current = cups[(newCurrentIndex + 1) % cups.size]
-            println()
+
+            val nextToCurrent = cups[pickUp[2]].successor
+
+            cups[current].successor = nextToCurrent
+            cups[nextToCurrent].predecessor = current
+
+            val nextToDestination = cups[destinationCup].successor
+
+            cups[destinationCup].successor = pickUp[0]
+            cups[pickUp[0]].predecessor = destinationCup
+            cups[pickUp[2]].successor = nextToDestination
+            cups[nextToDestination].predecessor = pickUp[2]
+
+            current = cups[current].successor
         }
-        return cups.rotateLeft(cups.indexOf(1)).drop(1).joinToString("")
+        return cups
     }
 
-    override fun partTwo(input: String): Any {
-        TODO("Not yet implemented")
+    private fun follow(cups: List<Cup>): List<Int> {
+        val result = mutableListOf<Int>()
+        var c = 1
+        repeat(9) {
+            result.add(cups[c].id)
+            c = cups[c].successor
+        }
+        return result
     }
 }
 
-private fun <E> List<E>.rotateLeft(steps: Int): List<E> {
-    return this.subList(steps, this.size) + this.subList(0, steps)
-}
+data class Cup(val id: Int, var predecessor: Int, var successor: Int)
