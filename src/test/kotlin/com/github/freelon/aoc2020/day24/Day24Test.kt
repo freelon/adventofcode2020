@@ -33,5 +33,6 @@ wseweeenwnesenwwwswnew"""
 
     @Test
     fun partTwo() {
+        assertEquals(2208, Day24().partTwo(testInput))
     }
 }

@@ -8,6 +8,11 @@ fun main() {
 
 class Day24 : DayTemplate() {
     override fun partOne(input: String): Int {
+        val blackTiles = initialBlackTiles(input)
+        return blackTiles.size
+    }
+
+    private fun initialBlackTiles(input: String): Set<Pair<Int, Int>> {
         val blackTiles = mutableSetOf<Pair<Int, Int>>()
         input.lines().forEach { line ->
             val p = walk(line)
@@ -17,8 +22,7 @@ class Day24 : DayTemplate() {
                 blackTiles.add(p)
             }
         }
-
-        return blackTiles.size
+        return blackTiles
     }
 
     private fun walk(line: String): Pair<Int, Int> {
@@ -56,7 +60,35 @@ class Day24 : DayTemplate() {
         return Pair(x, y)
     }
 
-    override fun partTwo(input: String): Any {
-        TODO("Not yet implemented")
+    override fun partTwo(input: String): Int {
+        var blacks = initialBlackTiles(input)
+        repeat(100) {
+            blacks = (blacks + blacks.flatMap { it.neighbors() }).mapNotNull { p ->
+                if (blacks.contains(p)) {
+                    val blackNeighbors = p.neighbors().count { blacks.contains(it) }
+                    if (blackNeighbors == 0 || blackNeighbors > 2)
+                        null
+                    else
+                        p
+                } else {
+                    val blackNeighbors = p.neighbors().count { blacks.contains(it) }
+                    if (blackNeighbors == 2)
+                        p
+                    else
+                        null
+                }
+            }.toSet()
+        }
+
+        return blacks.size
     }
 }
+
+private fun Pair<Int, Int>.neighbors(): Set<Pair<Int, Int>> = setOf(
+    Pair(this.first - 1, this.second + 1),
+    Pair(this.first + 1, this.second + 1),
+    Pair(this.first + 2, this.second),
+    Pair(this.first - 1, this.second - 1),
+    Pair(this.first + 1, this.second - 1),
+    Pair(this.first - 2, this.second),
+)
