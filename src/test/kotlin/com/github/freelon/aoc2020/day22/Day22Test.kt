@@ -27,5 +27,6 @@ Player 2:
 
     @Test
     fun partTwo() {
+        assertEquals(291, Day22().partTwo(input))
     }
 }
